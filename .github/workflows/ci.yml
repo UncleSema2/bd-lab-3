@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure DVC remote credentials
+        run: |
+          dvc remote modify remote --local access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          dvc remote modify remote --local secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Pull data with DVC
+        run: dvc pull
+
+      - name: Reproduce pipeline with DVC
+        run: dvc repro
+
+      - name: Run unit tests with coverage
+        run: |
+          coverage run -m unittest discover -s src/unit_tests -p "test_*.py"
+          coverage report -m
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install DVC
+        run: pip install dvc dvc-s3
+
+      - name: Configure DVC remote credentials
+        run: |
+          dvc remote modify remote --local access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          dvc remote modify remote --local secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Pull data with DVC
+        run: dvc pull
+
+      - name: Generate dev_sec_ops.yml
+        run: |
+          {
+            echo "docker_image: unclesema2/bd-lab-2-8:${GITHUB_SHA}"
+            echo "last_5_commits:"
+            git log -n 5 --pretty=format:'  - %h'
+            echo ""
+          } > dev_sec_ops.yml
+          cat dev_sec_ops.yml
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            unclesema2/bd-lab-2-8:latest
+            unclesema2/bd-lab-2-8:${{ github.sha }}

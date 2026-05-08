@@ -1,0 +1,7 @@
+[core]
+    autostage = true
+    remote = remote
+['remote "remote"']
+    url = s3://big-data-labs/lab1
+    endpointurl = https://storage.yandexcloud.net/
+    region = ru-central1

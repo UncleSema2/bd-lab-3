@@ -1,0 +1,26 @@
+stages:
+  preprocess:
+    cmd: python -m src.preprocess
+    deps:
+      - src/preprocess.py
+      - config.ini
+      - data/raw/X.csv
+      - data/raw/y.csv
+    outs:
+      - data/processed/X_train.csv
+      - data/processed/y_train.csv
+      - data/processed/X_test.csv
+      - data/processed/y_test.csv
+
+  train:
+    cmd: python -m src.train
+    deps:
+      - src/train.py
+      - config.ini
+      - data/processed/X_train.csv
+      - data/processed/y_train.csv
+      - data/processed/X_test.csv
+      - data/processed/y_test.csv
+    outs:
+      - experiments/log_reg.sav
+      - experiments/scaler.pkl

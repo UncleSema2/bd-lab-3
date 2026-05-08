@@ -1,0 +1,74 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python -m src.preprocess
+    deps:
+    - path: config.ini
+      hash: md5
+      md5: 6d4dfdd15302f564243ce9979725062f
+      size: 296
+    - path: data/raw/X.csv
+      hash: md5
+      md5: 438f01fc88987da35e95dba11803e101
+      size: 122407
+    - path: data/raw/y.csv
+      hash: md5
+      md5: 5cb46b2e3cdaaf5ddb142538e849a804
+      size: 3312
+    - path: src/preprocess.py
+      hash: md5
+      md5: 87b3666a98d5652b63097d611747a30b
+      size: 1774
+    outs:
+    - path: data/processed/X_test.csv
+      hash: md5
+      md5: 68c1dd07a19947927d65d0931c07a5fe
+      size: 24759
+    - path: data/processed/X_train.csv
+      hash: md5
+      md5: 2e0120ee6e9ff33d51eef19bc7410aa3
+      size: 98024
+    - path: data/processed/y_test.csv
+      hash: md5
+      md5: 242e726cb4d049e3564fee846f01898d
+      size: 582
+    - path: data/processed/y_train.csv
+      hash: md5
+      md5: bbc9f29a4856994b639bcc6e4c3737aa
+      size: 2628
+  train:
+    cmd: python -m src.train
+    deps:
+    - path: config.ini
+      hash: md5
+      md5: 6d4dfdd15302f564243ce9979725062f
+      size: 296
+    - path: data/processed/X_test.csv
+      hash: md5
+      md5: 68c1dd07a19947927d65d0931c07a5fe
+      size: 24759
+    - path: data/processed/X_train.csv
+      hash: md5
+      md5: 2e0120ee6e9ff33d51eef19bc7410aa3
+      size: 98024
+    - path: data/processed/y_test.csv
+      hash: md5
+      md5: 242e726cb4d049e3564fee846f01898d
+      size: 582
+    - path: data/processed/y_train.csv
+      hash: md5
+      md5: bbc9f29a4856994b639bcc6e4c3737aa
+      size: 2628
+    - path: src/train.py
+      hash: md5
+      md5: 02ebec6fbe846a6f341eef484d4613b1
+      size: 2059
+    outs:
+    - path: experiments/log_reg.sav
+      hash: md5
+      md5: 59140920c8b777cbc730a9c9eefb5ff4
+      size: 956
+    - path: experiments/scaler.pkl
+      hash: md5
+      md5: 0aa2a0faee7ac75d144874d6a77a3815
+      size: 1802
