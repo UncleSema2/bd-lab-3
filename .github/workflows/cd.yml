@@ -35,6 +35,8 @@ jobs:
           echo "$vault_content" | grep '^cassandra_password:' | awk '{print "CASSANDRA_PASSWORD=" $2}' | sed 's/"//g' >> .env
           echo "$vault_content" | grep '^model_version:' | awk '{print "MODEL_VERSION=" $2}' | sed 's/"//g' >> .env
           cat .env
+        env:
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
       - name: Pull DVC data
         run: |
@@ -43,11 +45,15 @@ jobs:
           dvc remote modify remote --local access_key_id "$(echo "$vault_content" | grep '^aws_access_key_id:' | awk '{print $2}' | sed 's/"//g')"
           dvc remote modify remote --local secret_access_key "$(echo "$vault_content" | grep '^aws_secret_access_key:' | awk '{print $2}' | sed 's/"//g')"
           dvc pull
+        env:
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
       - name: Log in to DockerHub
         run: |
           vault_content=$(ANSIBLE_VAULT_PASSWORD_FILE=ansible/.vault_pass ansible-vault view ansible/group_vars/all/vault.yml)
           echo "$(echo "$vault_content" | grep '^dockerhub_token:' | awk '{print $2}' | sed 's/"//g')" | docker login -u "$(echo "$vault_content" | grep '^dockerhub_username:' | awk '{print $2}' | sed 's/"//g')" --password-stdin
+        env:
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
       - name: Pull latest image
         run: docker pull unclesema2/bd-lab-2-8:latest || true
