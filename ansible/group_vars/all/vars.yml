@@ -1,0 +1,6 @@
+cassandra_host: "127.0.0.1"
+cassandra_port: 9042
+cassandra_keyspace: "breast_cancer"
+cassandra_username: "cassandra"
+cassandra_password: "changeme"
+model_version: "1.0.0"

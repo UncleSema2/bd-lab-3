@@ -1,0 +1,25 @@
+---
+- name: Decrypt vault and generate .env file
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Generate .env from vault using shell
+      ansible.builtin.shell: |
+        vault_content=$$(ANSIBLE_VAULT_PASSWORD_FILE={{ vault_pass_file }} ansible-vault view group_vars/all/vault.yml 2>/dev/null)
+        printf 'CASSANDRA_HOST=%s\n' "$$(echo "$$vault_content" | grep '^cassandra_host:' | awk '{print $$2}' | tr -d '"'\"' ')" > .env
+        printf 'CASSANDRA_PORT=%s\n' "$$(echo "$$vault_content" | grep '^cassandra_port:' | awk '{print $$2}' | tr -d '"'\"' ')" >> .env
+        printf 'CASSANDRA_KEYSPACE=%s\n' "$$(echo "$$vault_content" | grep '^cassandra_keyspace:' | awk '{print $$2}' | tr -d '"'\"' ')" >> .env
+        printf 'CASSANDRA_USERNAME=%s\n' "$$(echo "$$vault_content" | grep '^cassandra_username:' | awk '{print $$2}' | tr -d '"'\"' ')" >> .env
+        printf 'CASSANDRA_PASSWORD=%s\n' "$$(echo "$$vault_content" | grep '^cassandra_password:' | awk '{print $$2}' | tr -d '"'\"' ')" >> .env
+        printf 'MODEL_VERSION=%s\n' "$$(echo "$$vault_content" | grep '^model_version:' | awk '{print $$2}' | tr -d '"'\"' ')" >> .env
+        cat .env
+      args:
+        executable: /bin/bash
+        chdir: "{{ playbook_dir }}/.."
+      environment:
+        ANSIBLE_VAULT_PASSWORD_FILE: "{{ vault_pass_file }}"
+      register: env_result
+
+    - ansible.builtin.debug:
+        msg: ".env file generated from Ansible Vault"
