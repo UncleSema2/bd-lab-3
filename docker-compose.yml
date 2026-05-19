@@ -38,7 +38,7 @@ services:
         condition: service_healthy
     env_file: .env
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)"]
+      test: ["CMD", "curl http://localhost:8000/health"]
       interval: 10s
       timeout: 3s
       retries: 5

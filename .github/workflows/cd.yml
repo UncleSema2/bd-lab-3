@@ -59,7 +59,7 @@ jobs:
         run: docker pull unclesema2/bd-lab-2-8:latest || true
 
       - name: Start services
-        run: docker compose -f docker-compose.prod.yml up -d
+        run: docker compose up -d
 
       - name: Wait for API to be ready
         run: |
@@ -71,7 +71,7 @@ jobs:
             sleep 2
           done
           echo "API did not start in time"
-          docker compose -f docker-compose.prod.yml logs web
+          docker compose logs web
           exit 1
 
       - name: Run functional API test
@@ -96,10 +96,10 @@ jobs:
 
       - name: Run unit tests with coverage inside container
         run: |
-          docker compose -f docker-compose.prod.yml exec -T web sh -c "pip install --no-cache-dir coverage==7.6.10 && \
+          docker compose exec -T web sh -c "pip install --no-cache-dir coverage==7.6.10 && \
             coverage run --source=src -m unittest discover -s src/unit_tests -p "test_*.py" && \
             coverage report -m"
 
       - name: Stop services
         if: always()
-        run: docker compose -f docker-compose.prod.yml down -v
+        run: docker compose down -v
