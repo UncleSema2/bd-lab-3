@@ -120,5 +120,5 @@ jobs:
           context: .
           push: true
           tags: |
-            unclesema2/bd-lab-2-8:latest
-            unclesema2/bd-lab-2-8:${{ github.sha }}
+            unclesema2/bd-lab-3-8:latest
+            unclesema2/bd-lab-3-8:${{ github.sha }}
