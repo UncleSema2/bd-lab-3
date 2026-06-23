@@ -56,7 +56,7 @@ jobs:
           ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
       - name: Pull latest image
-        run: docker pull unclesema2/bd-lab-2-8:latest || true
+        run: docker pull unclesema2/bd-lab-3-8:latest || true
 
       - name: Start services
         run: docker compose up -d

@@ -98,7 +98,7 @@ jobs:
       - name: Generate dev_sec_ops.yml
         run: |
           {
-            echo "docker_image: unclesema2/bd-lab-2-8:${GITHUB_SHA}"
+            echo "docker_image: unclesema2/bd-lab-3-8:${GITHUB_SHA}"
             echo "last_5_commits:"
             git log -n 5 --pretty=format:'  - %h'
             echo ""
